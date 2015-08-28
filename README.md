@@ -5,23 +5,22 @@ Vs2015 plugin for simplifying mapping.
 
 ###Fill in 
   * object initializer
+  * constructors
 
 ###Map from
   * local variables
+  * method parameters
   * default
   
 
 ## Planned
 
 ###Fill in 
-  * constructors
   * linq Select
 
 ###Map from
   * properties
   * fields
-  * method parameters
-  
   
 ## Maybe
 
