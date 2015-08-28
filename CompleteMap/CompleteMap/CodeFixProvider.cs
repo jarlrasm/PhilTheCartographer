@@ -112,7 +112,7 @@ namespace CompleteMap
 
             var newExpression = expression.AddExpressions(missingprops.Select(x=>
                 SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                SyntaxFactory.IdentifierName(PropertyName(x)),SyntaxFactory.DefaultExpression(SyntaxFactory.ParseTypeName(x.Parameters.First().Type.Name)))).Cast<ExpressionSyntax>().ToArray());
+                SyntaxFactory.IdentifierName(PropertyName(x)),DefaultExpression(x.Parameters.First().Type, PropertyName(x)))).Cast<ExpressionSyntax>().ToArray());
 
             var root = await document.GetSyntaxRootAsync();
             var newroot = root.ReplaceNode(expression, newExpression);
@@ -203,13 +203,31 @@ namespace CompleteMap
                 {
 
                     newExpression =
-                        newExpression.AddArguments(SyntaxFactory.Argument(SyntaxFactory.DefaultExpression(SyntaxFactory.ParseTypeName(param.Type.Name))));
+                        newExpression.AddArguments(SyntaxFactory.Argument(DefaultExpression(param.Type,param.Name)));
                 }
 
             }
             var root = await document.GetSyntaxRootAsync();
             var newroot = root.ReplaceNode(expression, newExpression);
             return document.WithSyntaxRoot(newroot);
+        }
+
+
+        private static ExpressionSyntax DefaultExpression(ITypeSymbol type,string argname)
+        {
+            if (type.ToString() == "int")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(0));
+            if (type.ToString() == "long")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(0));
+            if (type.ToString() == "decimal")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(0));
+            if (type.ToString() == "string")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(argname));
+            if (type.ToString() == "bool")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
+            if (type.IsReferenceType || type.Name == "Nullable")
+                return SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+            return SyntaxFactory.DefaultExpression(SyntaxFactory.ParseTypeName(type.ToString()));
         }
 
 
