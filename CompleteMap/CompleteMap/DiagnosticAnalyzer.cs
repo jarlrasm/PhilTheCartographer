@@ -49,7 +49,10 @@ namespace CompleteMap
                     x =>
                         node.Expressions.All(
                             y => ((IdentifierNameSyntax)((AssignmentExpressionSyntax)y).Left).Identifier.Text != PropertyName(x)));
-            ReportForUnimplemented(context, unimplemntedProperties, semanticModel, node, typeSymbol);
+            if (unimplemntedProperties.Any())
+            {
+                ReportForUnimplemented(context, unimplemntedProperties, semanticModel, node, typeSymbol);
+            }
         }
         private static void AnalyzeConstructor(SyntaxNodeAnalysisContext context)
         {
@@ -67,29 +70,59 @@ namespace CompleteMap
             foreach (var constructor in constructors)
             {
                 var unimplemntedParameters = constructor.Parameters.Skip(node.Arguments.Count);
-                ReportForUnimplemented(context, unimplemntedParameters, semanticModel, node, typeSymbol);
+                    ReportForUnimplemented(context, unimplemntedParameters, semanticModel, node, typeSymbol);
             }
         }
+
+        private static void ReportForUnimplemented(SyntaxNodeAnalysisContext context,
+                                                   IEnumerable<IMethodSymbol> unimplemntedProperties,
+                                                   SemanticModel semanticModel,
+                                                   InitializerExpressionSyntax node,
+                                                   TypeInfo typeSymbol)
+        {
+                var typesymbols = GetTypeSymbols(semanticModel, node, typeSymbol);
+                foreach (var symbol in typesymbols.Where(x => ImplementsSomethingFor(x.Type, unimplemntedProperties)))
+                {
+                    var prop = ImmutableDictionary<string, string>.Empty.Add("local", symbol.Name);
+                    context.ReportDiagnostic(diagnostic: Diagnostic.Create(FromRule, context.Node.GetLocation(), prop, symbol.Name));
+                }
+                var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation());
+
+                context.ReportDiagnostic(diagnostic);
+        }
+
 
 
         private static void ReportForUnimplemented(SyntaxNodeAnalysisContext context, IEnumerable<IParameterSymbol> unimplemntedParameters, SemanticModel semanticModel, ArgumentListSyntax node, TypeInfo typeSymbol)
         {
-            var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
-                .OfType<ILocalSymbol>().
-                Where(x => x.Type != typeSymbol.Type)
-                .Select(x => new { Name = x.Name, Type = x.Type })
-                .Concat(
-                    semanticModel.LookupSymbols(node.SpanStart)
-                        .OfType<IParameterSymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
-                        .Select(x => new { Name = x.Name, Type = x.Type })
-                );
-            foreach (var symbol in typesymbol.Where(x => ImplementsSomethingFor(x.Type, unimplemntedParameters)))
+            var typesymbols = GetTypeSymbols(semanticModel, node, typeSymbol);
+            foreach (var symbol in typesymbols.Where(x => ImplementsSomethingFor(x.Type, unimplemntedParameters)))
             {
                 var prop = ImmutableDictionary<string, string>.Empty.Add("local", symbol.Name);
                 context.ReportDiagnostic(diagnostic: Diagnostic.Create(ConstructorFromRule, context.Node.GetLocation(), prop, symbol.Name));
             }
         }
+
+        private class TypedSymbol
+        {
+            public string Name { get; internal set; }
+            public ITypeSymbol Type { get; internal set; }
+        }
+        private static IEnumerable<TypedSymbol> GetTypeSymbols(SemanticModel semanticModel, SyntaxNode node, TypeInfo typeSymbol)
+        {
+            var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
+                .OfType<ILocalSymbol>().
+                Where(x => x.Type != typeSymbol.Type)
+                .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
+                .Concat(
+                    semanticModel.LookupSymbols(node.SpanStart)
+                        .OfType<IParameterSymbol>()
+                        .Where(x => x.Type != typeSymbol.Type)
+                        .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
+                );
+            return typesymbol;
+        }
+
 
         private static bool HasMoreArguments(IMethodSymbol constructor, SeparatedSyntaxList<ArgumentSyntax> arguments,SemanticModel semanticModel)
         {
@@ -105,35 +138,6 @@ namespace CompleteMap
         }
 
         
-        private static void ReportForUnimplemented(SyntaxNodeAnalysisContext context,
-                                                   IEnumerable<IMethodSymbol> unimplemntedProperties,
-                                                   SemanticModel semanticModel,
-                                                   InitializerExpressionSyntax node,
-                                                   TypeInfo typeSymbol)
-        {
-            if (unimplemntedProperties.Any())
-            {
-                var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
-                    .OfType<ILocalSymbol>().
-                    Where(x => x.Type != typeSymbol.Type)
-                    .Select(x => new { Name = x.Name, Type = x.Type })
-                    .Concat(
-                        semanticModel.LookupSymbols(node.SpanStart)
-                            .OfType<IParameterSymbol>()
-                            .Where(x => x.Type != typeSymbol.Type)
-                            .Select(x => new { Name = x.Name, Type = x.Type })
-                    );
-                foreach (var symbol in typesymbol.Where(x => ImplementsSomethingFor(x.Type, unimplemntedProperties)))
-                {
-                    var prop = ImmutableDictionary<string, string>.Empty.Add("local", symbol.Name);
-                    context.ReportDiagnostic(diagnostic : Diagnostic.Create(FromRule, context.Node.GetLocation(), prop, symbol.Name));
-                }
-                var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation());
-
-                context.ReportDiagnostic(diagnostic);
-            }
-        }
-
 
         public static string PropertyName(ISymbol symbol)  => symbol.Name.Substring("set_".Length);
 

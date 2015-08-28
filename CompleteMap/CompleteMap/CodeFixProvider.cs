@@ -53,7 +53,7 @@ namespace CompleteMap
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: diagnostic.GetMessage(),
-                        createChangedDocument: c => ImplementConstructorFrom(context.Document, declaration, c, diagnostic.Properties["local"]),
+                        createChangedDocument: c => RunFix(context.Document, declaration, c, diagnostic.Properties["local"], ImplementConstructorFromExpression),
                         equivalenceKey: diagnostic.GetMessage()),
                     diagnostic);
 
@@ -94,12 +94,17 @@ namespace CompleteMap
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: diagnostic.GetMessage(),
-                        createChangedDocument: c => ImplementAllSettersFrom(context.Document, declaration, c,diagnostic.Properties["local"]),
+                        createChangedDocument: c => RunFix<InitializerExpressionSyntax>(
+                            context.Document, declaration, c,diagnostic.Properties["local"], 
+                            ImplementAllSettersFromExpression
+                            ),
                         equivalenceKey: diagnostic.GetMessage()),
                     diagnostic);
 
             }
         }
+
+
 
 
         private async Task<Document> ImplementAllSetters(Document document, InitializerExpressionSyntax expression, CancellationToken cancellationToken)
@@ -120,7 +125,7 @@ namespace CompleteMap
         }
 
 
-        private static IEnumerable<IMethodSymbol> GetUnImplemntedProperties(InitializerExpressionSyntax expression, IEnumerable<IMethodSymbol> properties)
+        private static IEnumerable<IMethodSymbol> GetUnimplemntedProperties(InitializerExpressionSyntax expression, IEnumerable<IMethodSymbol> properties)
         {
             var uniimplemntedProperties =
                 properties.Where(
@@ -130,47 +135,85 @@ namespace CompleteMap
             return uniimplemntedProperties;
         }
 
-
-        private async Task<Document> ImplementAllSettersFrom(Document document, InitializerExpressionSyntax expression, CancellationToken cancellationToken, string sourcename)
+        
+        private async Task<Document> RunFix<T>(Document document, T expression, CancellationToken cancellationToken, string sourcename,Func<T,string,TypeInfo, SemanticModel, ITypeSymbol,  SyntaxNode> implement)
+            where T:SyntaxNode
         {
             var createExpression = expression.Parent as ObjectCreationExpressionSyntax;
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken);
-            var missingprops = GetMissingProperties(expression, typeSymbol);
+            var targetTypeInfo = semanticModel.GetTypeInfo(createExpression, cancellationToken);
 
-            var typesymbol = semanticModel.LookupSymbols(expression.SpanStart)
-                .OfType<ILocalSymbol>()
-                .Where(x => x.Type != typeSymbol.Type)
-                .Where(x => x.Name == sourcename)
-                .Select(x=>x.Type)
-                .Concat(
-                 semanticModel.LookupSymbols(expression.SpanStart)
-                .OfType<IParameterSymbol>()
-                .Where(x => x.Type != typeSymbol.Type)
-                .Where(x => x.Name == sourcename)
-                .Select(x => x.Type)
-                )
-                .First();
-            var newproperties=typesymbol.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => IsMissing(x, missingprops));
-            var newExpression = expression.AddExpressions(
-                newproperties.Select(x =>
-                SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                SyntaxFactory.IdentifierName(x.Name), 
-                SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,  SyntaxFactory.IdentifierName(sourcename), SyntaxFactory.IdentifierName(x.Name))))
-                .Cast<ExpressionSyntax>().ToArray());
-              
+            var sourceType = GetSourceType(expression, sourcename, semanticModel, targetTypeInfo);
+
+            var newExpression = implement(expression, sourcename, targetTypeInfo, semanticModel, sourceType);
             var root = await document.GetSyntaxRootAsync();
             var newroot = root.ReplaceNode(expression, newExpression);
             return document.WithSyntaxRoot(newroot);
         }
-
-        private async Task<Document> ImplementConstructorFrom(Document document, ArgumentListSyntax expression, CancellationToken cancellationToken, string sourcename)
+        private static SyntaxNode ImplementAllSettersFromExpression(InitializerExpressionSyntax expression,
+                                                                                 string sourcename,
+                                                                                 TypeInfo targetTypeInfo,
+                                                                                 SemanticModel semanticModel,
+                                                                                 ITypeSymbol sourceType)
         {
-            var createExpression = expression.Parent as ObjectCreationExpressionSyntax;
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken);
+            var missingprops = GetMissingProperties(expression, targetTypeInfo);
 
-            var typesymbol = semanticModel.LookupSymbols(expression.SpanStart)
+            var newproperties =
+                sourceType.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => IsMissing(x, missingprops));
+            var newExpression = expression.AddExpressions(
+                newproperties.Select(x =>
+                                         SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                                                                            SyntaxFactory.IdentifierName(x.Name),
+                                                                            SyntaxFactory.MemberAccessExpression(
+                                                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                                                SyntaxFactory.IdentifierName(sourcename),
+                                                                                SyntaxFactory.IdentifierName(x.Name))))
+                    .Cast<ExpressionSyntax>().ToArray());
+            return newExpression;
+        }
+
+
+        private static SyntaxNode ImplementConstructorFromExpression(ArgumentListSyntax expression,
+                                                                             string sourcename,
+                                                                             TypeInfo targetTypeInfo,
+                                                                             SemanticModel semanticModel,
+                                                                             ITypeSymbol sourceType)
+        {
+            var constructors =
+                targetTypeInfo.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
+                    x => x.MethodKind == MethodKind.Constructor);
+
+            var constructor =
+                constructors.Where(x => HasMoreArguments(x, expression.Arguments, semanticModel)).OrderByDescending(x => x.Parameters.Count()).First
+                    ();
+            var newExpression = expression;
+            foreach (var param in constructor.Parameters.Skip(expression.Arguments.Count()))
+            {
+                var identifier =
+                    sourceType.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().FirstOrDefault(
+                        x => x.Type == param.Type && x.Name.ToLower() == param.Name.ToLower());
+                if (identifier != null)
+                {
+                    newExpression =
+                        newExpression.AddArguments(
+                            SyntaxFactory.Argument(SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                                                                        SyntaxFactory.IdentifierName(sourcename),
+                                                                                        SyntaxFactory.IdentifierName(identifier.Name))));
+                }
+                else
+                {
+                    newExpression =
+                        newExpression.AddArguments(SyntaxFactory.Argument(DefaultExpression(param.Type, param.Name)));
+                }
+            }
+            return newExpression;
+        }
+
+
+
+        private static ITypeSymbol GetSourceType(SyntaxNode expression, string sourcename, SemanticModel semanticModel, TypeInfo typeSymbol)
+        {
+            var sourceType = semanticModel.LookupSymbols(expression.SpanStart)
                 .OfType<ILocalSymbol>()
                 .Where(x => x.Type != typeSymbol.Type)
                 .Where(x => x.Name == sourcename)
@@ -183,33 +226,7 @@ namespace CompleteMap
                         .Select(x => x.Type)
                 )
                 .First();
-
-            var constructors = typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor);
-
-            var constructor=constructors.Where(x => HasMoreArguments(x, expression.Arguments, semanticModel)).OrderByDescending(x=>x.Parameters.Count()).First();
-            var newExpression = expression;
-            foreach (var param in constructor.Parameters.Skip(expression.Arguments.Count()))
-            {
-                var identifier=typesymbol.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().FirstOrDefault(x => x.Type==param.Type&&x.Name.ToLower()==param.Name.ToLower());
-                if (identifier != null)
-                {
-                    newExpression =
-                        newExpression.AddArguments(
-                            SyntaxFactory.Argument(SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                                                                        SyntaxFactory.IdentifierName(sourcename),
-                                                                                        SyntaxFactory.IdentifierName(identifier.Name))));
-                }
-                else
-                {
-
-                    newExpression =
-                        newExpression.AddArguments(SyntaxFactory.Argument(DefaultExpression(param.Type,param.Name)));
-                }
-
-            }
-            var root = await document.GetSyntaxRootAsync();
-            var newroot = root.ReplaceNode(expression, newExpression);
-            return document.WithSyntaxRoot(newroot);
+            return sourceType;
         }
 
 
@@ -250,7 +267,7 @@ namespace CompleteMap
                 typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
                     x => x.MethodKind == MethodKind.PropertySet);
 
-            var missingprops = GetUnImplemntedProperties(expression, properties);
+            var missingprops = GetUnimplemntedProperties(expression, properties);
             return missingprops;
         }
         
