@@ -150,6 +150,7 @@ namespace CompleteMap
             var newroot = root.ReplaceNode(expression, newExpression);
             return document.WithSyntaxRoot(newroot);
         }
+
         private static SyntaxNode ImplementAllSettersFromExpression(InitializerExpressionSyntax expression,
                                                                                  string sourcename,
                                                                                  TypeInfo targetTypeInfo,

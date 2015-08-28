@@ -39,7 +39,9 @@ namespace CompleteMap
         {
             var node = context.Node as InitializerExpressionSyntax;
 
-            var createExpression = node.Parent as ObjectCreationExpressionSyntax;
+            var createExpression = node?.Parent as ObjectCreationExpressionSyntax;
+            if (createExpression == null)
+                return;
             var semanticModel = context.SemanticModel;
             var typeSymbol = semanticModel.GetTypeInfo(createExpression);
             var properties = typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.PropertySet);
@@ -58,7 +60,9 @@ namespace CompleteMap
         {
             var node = context.Node as ArgumentListSyntax;
 
-            var createExpression = node.Parent as ObjectCreationExpressionSyntax;
+            var createExpression = node?.Parent as ObjectCreationExpressionSyntax;
+            if (createExpression == null)
+                return;
             var semanticModel = context.SemanticModel;
             var typeSymbol = semanticModel.GetTypeInfo(createExpression);
 
