@@ -22,7 +22,7 @@ namespace CompleteMap
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(CompleteMapAnalyzer.DiagnosticFromId, CompleteMapAnalyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(CompleteMapAnalyzer.DiagnosticFromId, CompleteMapAnalyzer.DiagnosticId,CompleteMapAnalyzer.DiagnosticConstructorFromId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()
@@ -36,6 +36,28 @@ namespace CompleteMap
 
             RegisterFixFrom(context, root);
             RegisterFixBlank(context, root);
+            RegisterFixConstructorFrom(context, root);
+        }
+
+        private void RegisterFixConstructorFrom(CodeFixContext context, SyntaxNode root)
+        {
+            var diagnostics = context.Diagnostics.Where(x => x.Id == CompleteMapAnalyzer.DiagnosticConstructorFromId);
+            foreach (var diagnostic in diagnostics)
+            {
+                var diagnosticSpan = diagnostic.Location.SourceSpan;
+
+                // Find the type declaration identified by the diagnostic.
+                var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<ArgumentListSyntax>().First();
+
+                // Register a code action that will invoke the fix.
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: diagnostic.GetMessage(),
+                        createChangedDocument: c => ImplementConstructorFrom(context.Document, declaration, c, diagnostic.Properties["local"]),
+                        equivalenceKey: diagnostic.GetMessage()),
+                    diagnostic);
+
+            }
         }
 
 
@@ -142,6 +164,67 @@ namespace CompleteMap
             return document.WithSyntaxRoot(newroot);
         }
 
+        private async Task<Document> ImplementConstructorFrom(Document document, ArgumentListSyntax expression, CancellationToken cancellationToken, string sourcename)
+        {
+            var createExpression = expression.Parent as ObjectCreationExpressionSyntax;
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken);
+
+            var typesymbol = semanticModel.LookupSymbols(expression.SpanStart)
+                .OfType<ILocalSymbol>()
+                .Where(x => x.Type != typeSymbol.Type)
+                .Where(x => x.Name == sourcename)
+                .Select(x => x.Type)
+                .Concat(
+                    semanticModel.LookupSymbols(expression.SpanStart)
+                        .OfType<IParameterSymbol>()
+                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Name == sourcename)
+                        .Select(x => x.Type)
+                )
+                .First();
+
+            var constructors = typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor);
+
+            var constructor=constructors.Where(x => HasMoreArguments(x, expression.Arguments, semanticModel)).OrderByDescending(x=>x.Parameters.Count()).First();
+            var newExpression = expression;
+            foreach (var param in constructor.Parameters.Skip(expression.Arguments.Count()))
+            {
+                var identifier=typesymbol.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().FirstOrDefault(x => x.Type==param.Type&&x.Name.ToLower()==param.Name.ToLower());
+                if (identifier != null)
+                {
+                    newExpression =
+                        newExpression.AddArguments(
+                            SyntaxFactory.Argument(SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                                                                        SyntaxFactory.IdentifierName(sourcename),
+                                                                                        SyntaxFactory.IdentifierName(identifier.Name))));
+                }
+                else
+                {
+
+                    newExpression =
+                        newExpression.AddArguments(SyntaxFactory.Argument(SyntaxFactory.DefaultExpression(SyntaxFactory.ParseTypeName(param.Type.Name))));
+                }
+
+            }
+            var root = await document.GetSyntaxRootAsync();
+            var newroot = root.ReplaceNode(expression, newExpression);
+            return document.WithSyntaxRoot(newroot);
+        }
+
+
+        private static bool HasMoreArguments(IMethodSymbol constructor, SeparatedSyntaxList<ArgumentSyntax> arguments, SemanticModel semanticModel)
+        {
+            if (constructor.Parameters.Count() <= arguments.Count)
+                return false;
+            for (int i = 0; i > arguments.Count; i++)
+            {
+                var argtype = semanticModel.GetTypeInfo(arguments[i]);
+                if (constructor.Parameters[i].Type != argtype.Type)
+                    return false;
+            }
+            return true;
+        }
 
         private static IEnumerable<IMethodSymbol> GetMissingProperties(InitializerExpressionSyntax expression, TypeInfo typeSymbol)
         {
@@ -152,8 +235,7 @@ namespace CompleteMap
             var missingprops = GetUnImplemntedProperties(expression, properties);
             return missingprops;
         }
-
-
+        
         private static bool IsMissing(IPropertySymbol symbol, IEnumerable<IMethodSymbol> missingprops)
         {
             return missingprops.Any(x => Compare(symbol, x));

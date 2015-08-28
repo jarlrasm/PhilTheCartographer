@@ -83,18 +83,7 @@ namespace CompleteMap.Test
                             new DiagnosticResultLocation("Test0.cs", 33, 37)
                         }
                 },
-
-                new DiagnosticResult
-                {
-                    Id = "CompleteConstructor",
-                    Message = "Fill in all blanks",
-                    Severity = DiagnosticSeverity.Info,
-                    Locations =
-                        new[]
-                        {
-                            new DiagnosticResultLocation("Test0.cs", 33, 37)
-                        }
-                },
+                
                 new DiagnosticResult
                 {
                     Id = "CompleteFrom",

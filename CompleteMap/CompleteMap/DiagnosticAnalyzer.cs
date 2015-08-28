@@ -16,7 +16,6 @@ namespace CompleteMap
     {
         public const string DiagnosticId = "CompleteBlank";
         public const string DiagnosticFromId = "CompleteFrom";
-        public const string DiagnosticConstructorId = "CompleteConstructor";
         public const string DiagnosticConstructorFromId = "CompleteConstructorFrom";
 
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
@@ -27,10 +26,8 @@ namespace CompleteMap
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
         private static DiagnosticDescriptor FromRule = new DiagnosticDescriptor(DiagnosticFromId, "Map", "Map from {0}", Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
-
-        private static DiagnosticDescriptor ConstructorRule = new DiagnosticDescriptor(DiagnosticConstructorId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
         private static DiagnosticDescriptor ConstructorFromRule = new DiagnosticDescriptor(DiagnosticConstructorFromId, "Map", "Map from {0}", Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(FromRule,Rule,ConstructorFromRule,ConstructorRule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(FromRule,Rule,ConstructorFromRule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -92,9 +89,6 @@ namespace CompleteMap
                 var prop = ImmutableDictionary<string, string>.Empty.Add("local", symbol.Name);
                 context.ReportDiagnostic(diagnostic: Diagnostic.Create(ConstructorFromRule, context.Node.GetLocation(), prop, symbol.Name));
             }
-            var diagnostic = Diagnostic.Create(ConstructorRule, context.Node.GetLocation());
-
-            context.ReportDiagnostic(diagnostic);
         }
 
         private static bool HasMoreArguments(IMethodSymbol constructor, SeparatedSyntaxList<ArgumentSyntax> arguments,SemanticModel semanticModel)
