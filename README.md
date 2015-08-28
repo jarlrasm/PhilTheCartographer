@@ -10,6 +10,8 @@ Vs2015 plugin for simplifying mapping.
 ###Map from
   * local variables
   * method parameters
+  * properties
+  * fields
   * default
   
 
@@ -19,8 +21,6 @@ Vs2015 plugin for simplifying mapping.
   * linq Select
 
 ###Map from
-  * properties
-  * fields
   
 ## Maybe
 
