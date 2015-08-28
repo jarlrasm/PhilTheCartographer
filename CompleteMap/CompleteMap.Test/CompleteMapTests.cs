@@ -32,6 +32,12 @@ namespace CompleteMap.Test
         }
         class Test2
         {
+                public Test2()
+                {}
+                public Test2(int i, string s)
+                {
+                    I=i,S=s
+                }
                 public int I{get;set;}
                 public string S{get;set;}
         }
@@ -39,14 +45,14 @@ namespace CompleteMap.Test
         {   
                 public Test2 field;
                 public Test2 Getter{return field;}
-                public void T(Test2 eh)
+                public void T(Test eh)
                 {
-                    var t2=new Test2
+                    var t2=new Test2()
                     {
                         I=default(int),
                         S=default(String)
                     }
-                    var t=new Test
+                    var t=new Test()
                     {
                         I=default(int)
                     };
@@ -57,24 +63,47 @@ namespace CompleteMap.Test
             {
                 new DiagnosticResult
                 {
+                    Id = "CompleteConstructorFrom",
+                    Message = "Map from t",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 33, 37)
+                        }
+                },
+                new DiagnosticResult
+                {
+                    Id = "CompleteConstructorFrom",
+                    Message = "Map from eh",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 33, 37)
+                        }
+                },
+
+                new DiagnosticResult
+                {
+                    Id = "CompleteConstructor",
+                    Message = "Fill in all blanks",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 33, 37)
+                        }
+                },
+                new DiagnosticResult
+                {
                     Id = "CompleteFrom",
                     Message = "Map from t2",
                     Severity = DiagnosticSeverity.Info,
                     Locations =
                         new[]
                         {
-                            new DiagnosticResultLocation("Test0.cs", 33, 21)
-                        }
-                },
-                new DiagnosticResult
-                {
-                    Id = "CompleteFrom",
-                    Message = "Map from eh",
-                    Severity = DiagnosticSeverity.Info,
-                    Locations =
-                        new[]
-                        {
-                            new DiagnosticResultLocation("Test0.cs", 33, 21)
+                            new DiagnosticResultLocation("Test0.cs", 39, 21)
                         }
                 },
                 new DiagnosticResult
@@ -85,7 +114,7 @@ namespace CompleteMap.Test
                     Locations =
                         new[]
                         {
-                            new DiagnosticResultLocation("Test0.cs", 33, 21)
+                            new DiagnosticResultLocation("Test0.cs", 39, 21)
                         }
                 }
             };
