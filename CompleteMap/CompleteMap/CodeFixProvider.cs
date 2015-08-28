@@ -116,12 +116,20 @@ namespace CompleteMap
             var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken);
             var missingprops = GetMissingProperties(expression, typeSymbol);
 
-            var localsymbol = semanticModel.LookupSymbols(expression.SpanStart)
-                .OfType<ILocalSymbol>().
-                Where(x => x.Type != typeSymbol.Type)
-                .First(x=>x.Name==sourcename);
-
-            var newproperties=localsymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => IsMissing(x, missingprops));
+            var typesymbol = semanticModel.LookupSymbols(expression.SpanStart)
+                .OfType<ILocalSymbol>()
+                .Where(x => x.Type != typeSymbol.Type)
+                .Where(x => x.Name == sourcename)
+                .Select(x=>x.Type)
+                .Concat(
+                 semanticModel.LookupSymbols(expression.SpanStart)
+                .OfType<IParameterSymbol>()
+                .Where(x => x.Type != typeSymbol.Type)
+                .Where(x => x.Name == sourcename)
+                .Select(x => x.Type)
+                )
+                .First();
+            var newproperties=typesymbol.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => IsMissing(x, missingprops));
             var newExpression = expression.AddExpressions(
                 newproperties.Select(x =>
                 SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,

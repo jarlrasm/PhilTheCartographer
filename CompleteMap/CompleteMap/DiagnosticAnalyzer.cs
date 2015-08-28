@@ -48,14 +48,21 @@ namespace CompleteMap
                         node.Expressions.All(
                             y => ((IdentifierNameSyntax)((AssignmentExpressionSyntax)y).Left).Identifier.Text != PropertyName(x)));
             if(unimplemntedProperties.Any())
-            { 
-                var localsymbols = semanticModel.LookupSymbols(node.SpanStart)
+            {
+                var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
                     .OfType<ILocalSymbol>().
-                    Where(x => x.Type != typeSymbol.Type);
-                foreach (var localsymbol in localsymbols.Where(x=>ImplementsSomethingFor(x.Type, unimplemntedProperties)))
+                    Where(x => x.Type != typeSymbol.Type)
+                    .Select(x => new  {Name=x.Name,Type=x.Type})
+                    .Concat(
+                        semanticModel.LookupSymbols(node.SpanStart)
+                            .OfType<IParameterSymbol>()
+                            .Where(x => x.Type != typeSymbol.Type)
+                            .Select(x => new { Name = x.Name, Type = x.Type })
+                    );
+                foreach (var symbol in typesymbol.Where(x=>ImplementsSomethingFor(x.Type, unimplemntedProperties)))
                 {
-                    var prop = ImmutableDictionary<string, string>.Empty.Add("local",localsymbol.Name);
-                    context.ReportDiagnostic(diagnostic : Diagnostic.Create(FromRule, context.Node.GetLocation(),prop, localsymbol.Name));
+                    var prop = ImmutableDictionary<string, string>.Empty.Add("local", symbol.Name);
+                    context.ReportDiagnostic(diagnostic : Diagnostic.Create(FromRule, context.Node.GetLocation(),prop, symbol.Name));
                 }
                 var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation());
 

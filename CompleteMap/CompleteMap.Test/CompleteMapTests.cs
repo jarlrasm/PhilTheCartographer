@@ -68,6 +68,17 @@ namespace CompleteMap.Test
                 },
                 new DiagnosticResult
                 {
+                    Id = "CompleteFrom",
+                    Message = "Map from eh",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 33, 21)
+                        }
+                },
+                new DiagnosticResult
+                {
                     Id = "CompleteBlank",
                     Message = "Fill in all blanks",
                     Severity = DiagnosticSeverity.Info,
