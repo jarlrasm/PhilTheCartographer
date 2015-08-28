@@ -226,6 +226,20 @@ namespace CompleteMap
                         .Where(x => x.Name == sourcename)
                         .Select(x => x.Type)
                 )
+                .Concat(
+                    semanticModel.LookupSymbols(expression.SpanStart)
+                        .OfType<IPropertySymbol>()
+                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Name == sourcename)
+                        .Select(x => x.Type)
+                )
+                .Concat(
+                    semanticModel.LookupSymbols(expression.SpanStart)
+                        .OfType<IFieldSymbol>()
+                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Name == sourcename)
+                        .Select(x => x.Type)
+                )
                 .First();
             return sourceType;
         }
