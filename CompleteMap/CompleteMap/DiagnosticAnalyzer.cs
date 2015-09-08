@@ -117,6 +117,7 @@ namespace CompleteMap
             var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
                 .OfType<ILocalSymbol>().
                 Where(x => x.Type != typeSymbol.Type)
+                .Where(x=>x.Locations.First().GetLineSpan().StartLinePosition<node.GetLocation().GetLineSpan().StartLinePosition)
                 .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 .Concat(
                     semanticModel.LookupSymbols(node.SpanStart)
