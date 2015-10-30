@@ -103,13 +103,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\DataHelper.cs" />
+    <Compile Include="InitializerFixerTest.cs" />
     <Compile Include="MissingInInitializerTest.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />
     <Compile Include="Helpers\CodeFixVerifier.Helper.cs" />
     <Compile Include="Helpers\DiagnosticResult.cs" />
     <Compile Include="Helpers\DiagnosticVerifier.Helper.cs" />
-    <Compile Include="CompleteMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
