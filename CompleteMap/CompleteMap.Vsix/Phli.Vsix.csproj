@@ -13,8 +13,8 @@
     <ProjectGuid>{F0260782-6C7E-44BF-A3EA-BAEFD76F1757}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CompleteMap</RootNamespace>
-    <AssemblyName>CompleteMap</AssemblyName>
+    <RootNamespace>Phil</RootNamespace>
+    <AssemblyName>Phil</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
