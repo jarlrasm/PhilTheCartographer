@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phil.Test", "CompleteMap\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phli.Vsix", "CompleteMap\CompleteMap.Vsix\Phli.Vsix.csproj", "{F0260782-6C7E-44BF-A3EA-BAEFD76F1757}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C7790F9B-E5CC-400B-8220-4BC4C5ADA1C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
