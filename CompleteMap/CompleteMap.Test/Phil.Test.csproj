@@ -114,9 +114,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CompleteMap\CompleteMap.csproj">
+    <ProjectReference Include="..\CompleteMap\Phil.csproj">
       <Project>{73EAD745-FB14-4183-AC71-A81D7FB716E3}</Project>
-      <Name>CompleteMap</Name>
+      <Name>Phil</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

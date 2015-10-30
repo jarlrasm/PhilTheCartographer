@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompleteMap", "CompleteMap\CompleteMap\CompleteMap.csproj", "{73EAD745-FB14-4183-AC71-A81D7FB716E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phil", "CompleteMap\CompleteMap\Phil.csproj", "{73EAD745-FB14-4183-AC71-A81D7FB716E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompleteMap.Test", "CompleteMap\CompleteMap.Test\CompleteMap.Test.csproj", "{EA03D4B8-FE7C-46E9-8B2F-78485F9E174D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phil.Test", "CompleteMap\CompleteMap.Test\Phil.Test.csproj", "{EA03D4B8-FE7C-46E9-8B2F-78485F9E174D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompleteMap.Vsix", "CompleteMap\CompleteMap.Vsix\CompleteMap.Vsix.csproj", "{F0260782-6C7E-44BF-A3EA-BAEFD76F1757}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phli.Vsix", "CompleteMap\CompleteMap.Vsix\Phli.Vsix.csproj", "{F0260782-6C7E-44BF-A3EA-BAEFD76F1757}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
