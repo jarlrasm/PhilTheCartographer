@@ -1,4 +1,4 @@
-# CompleteMap
+# Phil the Cartographer
 Vs2015 plugin for simplifying mapping.
 
 ## Current support
