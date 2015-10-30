@@ -2,16 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Phil.Analyzers;
 
 namespace Phil.Extensions
 {
-    static public class SemanticModelExtensions
+    public static class SemanticModelExtensions
     {
         public static IEnumerable<TypedSymbol> GetTypeSymbols(this SemanticModel semanticModel, SyntaxNode node, TypeInfo typeSymbol)
         {
-            var typesymbol = semanticModel.LookupSymbols(node.SpanStart)
+            var typesymbols = semanticModel.LookupSymbols(node.SpanStart)
                 .OfType<ILocalSymbol>().
                 Where(x => x.Type != typeSymbol.Type)
                 .Where(x => x.Locations.First().GetLineSpan().StartLinePosition < node.GetLocation().GetLineSpan().StartLinePosition)
@@ -32,7 +33,15 @@ namespace Phil.Extensions
                         .Where(x => x.Type != typeSymbol.Type)
                         .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 );
-            return typesymbol;
+            if(!semanticModel.GetEnclosingSymbol(node.SpanStart).IsStatic)
+            { 
+                typesymbols = typesymbols.Concat(new TypedSymbol[]
+                {
+                    new TypedSymbol()
+                    {Name = "this",Type =  (ITypeSymbol)semanticModel.GetDeclaredSymbol(node.Ancestors().OfType<ClassDeclarationSyntax>().First())}
+                });
+            }
+            return typesymbols;
         }
     }
 }

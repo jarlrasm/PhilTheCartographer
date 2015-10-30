@@ -35,6 +35,10 @@ namespace Phil.Extensions
 
         private static ITypeSymbol GetSourceType(SyntaxNode expression, string sourcename, SemanticModel semanticModel, TypeInfo typeSymbol)
         {
+            if (sourcename=="this")
+            {
+                return (ITypeSymbol)semanticModel.GetDeclaredSymbol(expression.Ancestors().OfType<ClassDeclarationSyntax>().First());
+            }
             var sourceType = semanticModel.LookupSymbols(expression.SpanStart)
                 .OfType<ILocalSymbol>()
                 .Where(x => x.Type != typeSymbol.Type)
