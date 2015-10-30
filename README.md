@@ -5,7 +5,7 @@ Vs2015 plugin for simplifying mapping.
 
 ###Fill in 
   * object initializer
-  * constructors
+  * constructor-usage
 
 ###Map from
   * local variables
