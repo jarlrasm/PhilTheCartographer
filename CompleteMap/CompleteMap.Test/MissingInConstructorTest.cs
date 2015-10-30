@@ -1,4 +1,10 @@
-﻿using CompleteMap.Test.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using CompleteMap.Test.Helpers;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,8 +17,8 @@ using TestHelper;
 namespace Phil.Test
 {
     [TestClass]
-    public class MissingInInitializerTest : DiagnosticVerifier
-    { 
+    public class MissingInConstructorTest : DiagnosticVerifier
+    {
         [TestMethod]
         public void FindDiagnostics()
         {
@@ -20,13 +26,13 @@ namespace Phil.Test
             {
                 new DiagnosticResult
                 {
-                    Id = "MissingInInitializer",
-                    Message = "MissingInInitializer",
+                    Id = "MissingInConstructor",
+                    Message = "MissingInConstructor",
                     Severity = DiagnosticSeverity.Info,
                     Locations =
                         new[]
                         {
-                            new DiagnosticResultLocation("Test0.cs", 24, 25)
+                            new DiagnosticResultLocation("Test0.cs", 23, 25)
                         }
                 }
             };
@@ -35,7 +41,7 @@ namespace Phil.Test
         }
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new MissingInInitializerAnalyzer();
+            return new MissingInConstructorAnalyzer();
         }
     }
 }

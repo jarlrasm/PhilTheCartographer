@@ -8,8 +8,8 @@
     <ProjectGuid>{EA03D4B8-FE7C-46E9-8B2F-78485F9E174D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CompleteMap.Test</RootNamespace>
-    <AssemblyName>CompleteMap.Test</AssemblyName>
+    <RootNamespace>Phil.Test</RootNamespace>
+    <AssemblyName>Phil.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -102,8 +102,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConstructorFixerTest.cs" />
     <Compile Include="Helpers\DataHelper.cs" />
     <Compile Include="InitializerFixerTest.cs" />
+    <Compile Include="MissingInConstructorTest.cs" />
     <Compile Include="MissingInInitializerTest.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />
