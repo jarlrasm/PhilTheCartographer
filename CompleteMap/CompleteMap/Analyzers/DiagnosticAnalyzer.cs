@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Threading;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CompleteMap
+namespace Phil.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CompleteMapAnalyzer : DiagnosticAnalyzer

@@ -6,6 +6,9 @@ using System;
 using TestHelper;
 using CompleteMap;
 
+using Phil.Analyzers;
+using Phil.CodeFixProviders;
+
 namespace CompleteMap.Test
 {
     [TestClass]
@@ -64,17 +67,6 @@ namespace CompleteMap.Test
                 new DiagnosticResult
                 {
                     Id = "CompleteConstructorFrom",
-                    Message = "Map from t",
-                    Severity = DiagnosticSeverity.Info,
-                    Locations =
-                        new[]
-                        {
-                            new DiagnosticResultLocation("Test0.cs", 33, 37)
-                        }
-                },
-                new DiagnosticResult
-                {
-                    Id = "CompleteConstructorFrom",
                     Message = "Map from eh",
                     Severity = DiagnosticSeverity.Info,
                     Locations =
@@ -83,11 +75,33 @@ namespace CompleteMap.Test
                             new DiagnosticResultLocation("Test0.cs", 33, 37)
                         }
                 },
-                
                 new DiagnosticResult
                 {
                     Id = "CompleteFrom",
                     Message = "Map from t2",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 39, 21)
+                        }
+                },
+                
+                new DiagnosticResult
+                {
+                    Id = "CompleteFrom",
+                    Message = "Map from Getter",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 39, 21)
+                        }
+                },
+                new DiagnosticResult
+                {
+                    Id = "CompleteFrom",
+                    Message = "Map from field",
                     Severity = DiagnosticSeverity.Info,
                     Locations =
                         new[]
@@ -117,31 +131,21 @@ namespace CompleteMap.Test
         public void ImplementMissingSetters()
         {
             var test = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-
-    namespace ConsoleApplication1
+namespace ConsoleApplication1
+{
+    class Test
     {
-        class Test
+        public int I{get;set;}
+        public string S{get;set;}
+    }
+    class TypeName
+    {   
+        public void T()
         {
-                public int I{get;set;}
-                public string S{get;set;}
+            var t=new Test{I=default(int)};
         }
-        class TypeName
-        {   
-                public void T()
-                {
-                    var t=new Test
-                    {
-                        I=default(int)
-                    };
-                }
-        }
-    }";
+    }
+}";
             var expected = new DiagnosticResult
             {
                 Id = "CompleteBlank",
@@ -149,40 +153,28 @@ namespace CompleteMap.Test
                 Severity = DiagnosticSeverity.Info,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 21, 21)
+                            new DiagnosticResultLocation("Test0.cs", 13, 27)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-
-    namespace ConsoleApplication1
+namespace ConsoleApplication1
+{
+    class Test
     {
-        class Test
+        public int I{get;set;}
+        public string S{get;set;}
+    }
+    class TypeName
+    {   
+        public void T()
         {
-                public int I{get;set;}
-                public string S{get;set;}
+            var t=new Test{I=default(int), S = ""S"" };
         }
-        class TypeName
-        {   
-                public void T()
-                {
-                    var t=new Test
-                    {
-                        I=default(int)
-,
-                        S = default(String)
-                    };
-                }
-        }
-    }";
+    }
+}";
             VerifyCSharpFix(test, fixtest);
         }
 
