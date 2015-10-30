@@ -84,18 +84,9 @@ namespace Phil.Analyzers
         
         private static bool ImplementsSomethingFor(ITypeSymbol type, IEnumerable<IParameterSymbol> mssingParameters)
         {
-            return type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => IsMissing(x, mssingParameters));
+            return type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => x.IsMissing(mssingParameters));
         }
 
-        private static bool IsMissing(IPropertySymbol symbol, IEnumerable<IParameterSymbol> mssingParameters)
-        {
-            return mssingParameters.Any(x => Compare(symbol, x));
-        }
-
-        private static bool Compare(IPropertySymbol symbol, IParameterSymbol x)
-        {
-            return x.Name.ToLower() == symbol.Name.ToLower() && x.Type == symbol.Type;
-        }
 
 
 

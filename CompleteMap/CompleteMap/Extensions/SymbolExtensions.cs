@@ -31,5 +31,24 @@ namespace Phil.Extensions
                 return SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
             return SyntaxFactory.DefaultExpression(SyntaxFactory.ParseTypeName(type.ToString()));
         }
+        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<IMethodSymbol> missingprops)
+        {
+            return missingprops.Any(x => Compare(symbol, x));
+        }
+
+
+        private static bool Compare(IPropertySymbol symbol, IMethodSymbol property)
+        {
+            return property.PropertyName() == symbol.Name && property.Parameters.First().Type.Equals(symbol.Type);
+        }
+        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<IParameterSymbol> mssingParameters)
+        {
+            return mssingParameters.Any(x => Compare(symbol, x));
+        }
+
+        private static bool Compare(IPropertySymbol symbol, IParameterSymbol parameter)
+        {
+            return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
+        }
     }
 }

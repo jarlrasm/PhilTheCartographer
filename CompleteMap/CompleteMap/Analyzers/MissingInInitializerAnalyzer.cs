@@ -71,17 +71,7 @@ namespace Phil.Analyzers
 
         private static bool ImplementsSomethingFor(ITypeSymbol type, IEnumerable<IMethodSymbol> missingprops)
         {
-            return type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => IsMissing(x, missingprops));
-        }
-        private static bool IsMissing(IPropertySymbol symbol, IEnumerable<IMethodSymbol> missingprops)
-        {
-            return missingprops.Any(x => Compare(symbol, x));
-        }
-
-
-        private static bool Compare(IPropertySymbol symbol, IMethodSymbol x)
-        {
-            return x.PropertyName() == symbol.Name && x.Parameters.First().Type == symbol.Type;
+            return type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => x.IsMissing(missingprops));
         }
 
     }

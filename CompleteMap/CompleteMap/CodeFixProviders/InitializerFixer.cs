@@ -74,7 +74,7 @@ namespace Phil.CodeFixProviders
 
             var newExpression = expression.AddExpressions(missingprops.Select(x =>
                 SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
-                SyntaxFactory.IdentifierName(PropertyName(x)), x.Parameters.First().Type.DefaultExpression( PropertyName(x)))).Cast<ExpressionSyntax>().ToArray());
+                SyntaxFactory.IdentifierName(x.PropertyName()), x.Parameters.First().Type.DefaultExpression(x.PropertyName()))).Cast<ExpressionSyntax>().ToArray());
 
             var root = await document.GetSyntaxRootAsync();
             var newroot = root.ReplaceNode(expression, newExpression);
@@ -93,7 +93,7 @@ namespace Phil.CodeFixProviders
             var missingprops = GetMissingProperties(expression, targetTypeInfo);
 
             var newproperties =
-                sourceType.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => IsMissing(x, missingprops));
+                sourceType.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => x.IsMissing(missingprops));
             var newExpression = expression.AddExpressions(
                 newproperties.Select(x =>
                                          SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
@@ -122,21 +122,11 @@ namespace Phil.CodeFixProviders
                 properties.Where(
                     x =>
                         expression.Expressions.All(
-                            y => ((IdentifierNameSyntax)((AssignmentExpressionSyntax)y).Left).Identifier.Text != PropertyName(x)));
+                            y => ((IdentifierNameSyntax)((AssignmentExpressionSyntax)y).Left).Identifier.Text != x.PropertyName()));
             return uniimplemntedProperties;
         }
+        
 
-        private static bool IsMissing(IPropertySymbol symbol, IEnumerable<IMethodSymbol> missingprops)
-        {
-            return missingprops.Any(x => Compare(symbol, x));
-        }
-
-
-        public static string PropertyName(ISymbol symbol) => symbol.Name.Substring("set_".Length);
-
-        private static bool Compare(IPropertySymbol symbol, IMethodSymbol x)
-        {
-            return PropertyName(x) == symbol.Name && x.Parameters.First().Type == symbol.Type;
-        }
+        
     }
 }
