@@ -13,12 +13,14 @@ Vs2015 plugin for simplifying mapping.
   * properties
   * fields
   * default
+  * this
   
 
 ## Planned
 
 ###Fill in 
   * linq Select
+  * .ctor
 
 ###Map from
   
