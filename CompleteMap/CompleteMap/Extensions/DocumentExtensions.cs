@@ -17,23 +17,25 @@ namespace Phil.Extensions
                                                      T expression,
                                                      CancellationToken cancellationToken,
                                                      string sourcename,
-                                                     Func<T, string, TypeInfo, SemanticModel, ITypeSymbol, SyntaxNode> implement)
+                                                     Func<T, string, ITypeSymbol, SemanticModel, ITypeSymbol, SyntaxNode> implement
+                                                     )
             where T : SyntaxNode
         {
-            var createExpression = expression.Parent as ObjectCreationExpressionSyntax;
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var targetTypeInfo = semanticModel.GetTypeInfo(createExpression, cancellationToken);
+            
+            var targetTypeInfo = semanticModel.GetTypeInfo(expression.Parent, cancellationToken);
 
-            var sourceType = GetSourceType(expression, sourcename, semanticModel, targetTypeInfo);
+            ITypeSymbol typesymbol = targetTypeInfo.Type??semanticModel.GetDeclaredSymbol(expression.Parent).ContainingType;//this really can't be right... but it works... I have to learn how to do this at one point..
+            var sourceType = GetSourceType(expression, sourcename, semanticModel, typesymbol);
 
-            var newExpression = implement(expression, sourcename, targetTypeInfo, semanticModel, sourceType);
-            var root = await document.GetSyntaxRootAsync();
+            var newExpression = implement(expression, sourcename, typesymbol, semanticModel, sourceType);
+            var root = await document.GetSyntaxRootAsync(cancellationToken);
             var newroot = root.ReplaceNode(expression, newExpression);
             return document.WithSyntaxRoot(newroot);
         }
 
 
-        private static ITypeSymbol GetSourceType(SyntaxNode expression, string sourcename, SemanticModel semanticModel, TypeInfo typeSymbol)
+        private static ITypeSymbol GetSourceType(SyntaxNode expression, string sourcename, SemanticModel semanticModel, ITypeSymbol typeSymbol)
         {
             if (sourcename=="this")
             {
@@ -41,27 +43,27 @@ namespace Phil.Extensions
             }
             var sourceType = semanticModel.LookupSymbols(expression.SpanStart)
                 .OfType<ILocalSymbol>()
-                .Where(x => x.Type != typeSymbol.Type)
+                .Where(x => x.Type != typeSymbol)
                 .Where(x => x.Name == sourcename)
                 .Select(x => x.Type)
                 .Concat(
                     semanticModel.LookupSymbols(expression.SpanStart)
                         .OfType<IParameterSymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Type != typeSymbol)
                         .Where(x => x.Name == sourcename)
                         .Select(x => x.Type)
                 )
                 .Concat(
                     semanticModel.LookupSymbols(expression.SpanStart)
                         .OfType<IPropertySymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Type != typeSymbol)
                         .Where(x => x.Name == sourcename)
                         .Select(x => x.Type)
                 )
                 .Concat(
                     semanticModel.LookupSymbols(expression.SpanStart)
                         .OfType<IFieldSymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
+                        .Where(x => x.Type != typeSymbol)
                         .Where(x => x.Name == sourcename)
                         .Select(x => x.Type)
                 )

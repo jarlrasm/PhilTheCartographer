@@ -59,12 +59,12 @@ namespace Phil.CodeFixProviders
 
         private static SyntaxNode ImplementConstructorFromExpression(ArgumentListSyntax expression,
                                                                              string sourcename,
-                                                                             TypeInfo targetTypeInfo,
+                                                                             ITypeSymbol targetTypeInfo,
                                                                              SemanticModel semanticModel,
                                                                              ITypeSymbol sourceType)
         {
             var constructors =
-                targetTypeInfo.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
+                targetTypeInfo.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
                     x => x.MethodKind == MethodKind.Constructor);
 
             var constructor =

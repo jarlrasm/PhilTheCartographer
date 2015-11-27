@@ -59,5 +59,14 @@ namespace Phil.Extensions
             return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
         }
 
+        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<IPropertySymbol> mssingParameters)
+        {
+            return mssingParameters.Any(x => Compare(symbol, x));
+        }
+
+        private static bool Compare(IPropertySymbol symbol, IPropertySymbol parameter)
+        {
+            return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
+        }
     }
 }

@@ -68,7 +68,7 @@ namespace Phil.CodeFixProviders
         {
             var createExpression = expression.Parent as ObjectCreationExpressionSyntax;
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken);
+            var typeSymbol = semanticModel.GetTypeInfo(createExpression, cancellationToken).Type;
             var missingprops = GetMissingProperties(expression, typeSymbol);
 
 
@@ -86,7 +86,7 @@ namespace Phil.CodeFixProviders
 
         private static SyntaxNode ImplementAllSettersFromExpression(InitializerExpressionSyntax expression,
                                                                                  string sourcename,
-                                                                                 TypeInfo targetTypeInfo,
+                                                                                 ITypeSymbol targetTypeInfo,
                                                                                  SemanticModel semanticModel,
                                                                                  ITypeSymbol sourceType)
         {
@@ -106,10 +106,10 @@ namespace Phil.CodeFixProviders
             return newExpression;
         }
 
-        private static IEnumerable<IMethodSymbol> GetMissingProperties(InitializerExpressionSyntax expression, TypeInfo typeSymbol)
+        private static IEnumerable<IMethodSymbol> GetMissingProperties(InitializerExpressionSyntax expression, ITypeSymbol typeSymbol)
         {
             var properties =
-                typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
+                typeSymbol.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
                     x => x.MethodKind == MethodKind.PropertySet);
 
             var missingprops = GetUnimplemntedProperties(expression, properties);
