@@ -38,8 +38,9 @@ namespace Phil.CodeFixProviders
                 var diagnosticSpan = diagnostic.Location.SourceSpan;
 
                 // Find the type declaration identified by the diagnostic.
-                var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<ArgumentListSyntax>().First();
-
+                var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<ArgumentListSyntax>().FirstOrDefault();
+                if (declaration == null)
+                    return;
                 foreach (var solution in diagnostic.Properties)
                 {
                     string title = string.Format("Fill constructor from {0}", solution.Value);
