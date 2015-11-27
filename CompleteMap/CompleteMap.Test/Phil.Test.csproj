@@ -105,6 +105,7 @@
     <Compile Include="ConstructorFixerTest.cs" />
     <Compile Include="Helpers\DataHelper.cs" />
     <Compile Include="InitializerFixerTest.cs" />
+    <Compile Include="MissingInConstructorBodyTest.cs" />
     <Compile Include="MissingInConstructorTest.cs" />
     <Compile Include="MissingInInitializerTest.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />

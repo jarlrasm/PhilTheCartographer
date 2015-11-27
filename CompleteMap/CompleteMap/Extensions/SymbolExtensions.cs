@@ -50,5 +50,14 @@ namespace Phil.Extensions
         {
             return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
         }
+        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<TypedSymbol> missingprops)
+        {
+            return missingprops.Any(x => Compare(symbol, x));
+        }
+        private static bool Compare(IPropertySymbol symbol, TypedSymbol parameter)
+        {
+            return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
+        }
+
     }
 }

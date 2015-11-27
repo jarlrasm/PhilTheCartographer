@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Analyzers\MissingInConstructorBodyAnalyzer.cs" />
     <Compile Include="Analyzers\MissingInConstructorAnalyzer.cs" />
     <Compile Include="Analyzers\MissingInInitializerAnalyzer.cs" />
     <Compile Include="Analyzers\TypedSymbol.cs" />

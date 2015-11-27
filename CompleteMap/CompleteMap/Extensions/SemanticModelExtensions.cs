@@ -10,31 +10,27 @@ namespace Phil.Extensions
 {
     public static class SemanticModelExtensions
     {
-        public static IEnumerable<TypedSymbol> GetTypeSymbols(this SemanticModel semanticModel, SyntaxNode node, TypeInfo typeSymbol)
+        public static IEnumerable<TypedSymbol> GetTypeSymbols(this SemanticModel semanticModel, SyntaxNode node)
         {
             var typesymbols = semanticModel.LookupSymbols(node.SpanStart)
-                .OfType<ILocalSymbol>().
-                Where(x => x.Type != typeSymbol.Type)
+                .OfType<ILocalSymbol>()
                 .Where(x => x.Locations.First().GetLineSpan().StartLinePosition < node.GetLocation().GetLineSpan().StartLinePosition)
                 .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 .Concat(
                     semanticModel.LookupSymbols(node.SpanStart)
                         .OfType<IParameterSymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
                         .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 ).Concat(
                     semanticModel.LookupSymbols(node.SpanStart)
                         .OfType<IPropertySymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
                         .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 ).Concat(
                     semanticModel.LookupSymbols(node.SpanStart)
                         .OfType<IFieldSymbol>()
-                        .Where(x => x.Type != typeSymbol.Type)
                         .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 );
-            if(!semanticModel.GetEnclosingSymbol(node.SpanStart).IsStatic)
-            { 
+            if (!semanticModel.GetEnclosingSymbol(node.SpanStart).IsStatic)
+            {
                 typesymbols = typesymbols.Concat(new TypedSymbol[]
                 {
                     new TypedSymbol()
@@ -42,6 +38,11 @@ namespace Phil.Extensions
                 });
             }
             return typesymbols;
+
+        }
+        public static IEnumerable<TypedSymbol> GetTypeSymbols(this SemanticModel semanticModel, SyntaxNode node, TypeInfo ignoredTypeSymbol)
+        {
+            return semanticModel.GetTypeSymbols(node).Where(x=>!x.Type.Equals(ignoredTypeSymbol.Type));
         }
     }
 }
