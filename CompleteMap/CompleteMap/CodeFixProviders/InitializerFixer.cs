@@ -109,7 +109,7 @@ namespace Phil.CodeFixProviders
         private static IEnumerable<IMethodSymbol> GetMissingProperties(InitializerExpressionSyntax expression, ITypeSymbol typeSymbol)
         {
             var properties =
-                typeSymbol.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
+                typeSymbol.GetBaseTypesAndThis().SelectMany(x=>x.GetMembers()).Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(
                     x => x.MethodKind == MethodKind.PropertySet);
 
             var missingprops = GetUnimplemntedProperties(expression, properties);

@@ -40,7 +40,7 @@ namespace Phil.Analyzers
                 return;
             var semanticModel = context.SemanticModel;
             var typeSymbol = ModelExtensions.GetTypeInfo(semanticModel, createExpression);
-            var properties = typeSymbol.Type.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.PropertySet);
+            var properties = typeSymbol.Type.GetBaseTypesAndThis().SelectMany(x=>x.GetMembers()).Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.PropertySet);
 
             var unimplemntedProperties =
                 properties.Where(
@@ -71,8 +71,7 @@ namespace Phil.Analyzers
 
         private static bool ImplementsSomethingFor(ITypeSymbol type, IEnumerable<IMethodSymbol> missingprops)
         {
-            return type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => x.IsMissing(missingprops));
+            return type.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => x.IsMissing(missingprops));
         }
-
     }
 }
