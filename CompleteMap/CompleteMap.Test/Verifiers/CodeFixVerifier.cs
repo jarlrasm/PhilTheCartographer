@@ -129,16 +129,8 @@ namespace TestHelper
 
             //after applying all of the code fixes, compare the resulting string to the inputted one
             var actual = GetStringFromDocument(document);
-            /*actual = Regex.Replace(actual, @"\u00A0", " ");
-            newSource = Regex.Replace(newSource, @"\u00A0", " ");
 
-            for (int i = 0; i < actual.Length; i++)
-            {
-                if (actual[i] != newSource[i])
-                {
-                    throw new Exception("Difference at character: " + i + 1);
-                }
-            }*/
+            
             Assert.AreEqual(newSource, actual);
         }
     }
