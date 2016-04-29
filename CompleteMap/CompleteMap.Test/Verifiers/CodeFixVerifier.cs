@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -6,6 +8,7 @@ using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace TestHelper
@@ -81,8 +84,12 @@ namespace TestHelper
             for (int i = 0; i < attempts; ++i)
             {
                 var actions = new List<CodeAction>();
-                var context = new CodeFixContext(document, analyzerDiagnostics[0], (a, d) => actions.Add(a), CancellationToken.None);
-                codeFixProvider.RegisterCodeFixesAsync(context).Wait();
+                foreach (var analyzerDiagnostic in analyzerDiagnostics)
+                {
+
+                    var context = new CodeFixContext(document, analyzerDiagnostic, (a, d) => actions.Add(a), CancellationToken.None);
+                    codeFixProvider.RegisterCodeFixesAsync(context).Wait();
+                }
 
                 if (!actions.Any())
                 {
@@ -122,6 +129,16 @@ namespace TestHelper
 
             //after applying all of the code fixes, compare the resulting string to the inputted one
             var actual = GetStringFromDocument(document);
+            /*actual = Regex.Replace(actual, @"\u00A0", " ");
+            newSource = Regex.Replace(newSource, @"\u00A0", " ");
+
+            for (int i = 0; i < actual.Length; i++)
+            {
+                if (actual[i] != newSource[i])
+                {
+                    throw new Exception("Difference at character: " + i + 1);
+                }
+            }*/
             Assert.AreEqual(newSource, actual);
         }
     }

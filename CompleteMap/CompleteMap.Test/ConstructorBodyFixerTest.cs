@@ -23,46 +23,9 @@ namespace Phil.Test
         [TestMethod]
         public void FillFromArgument()
         {
-            var code =
-@"      class Test
-        {
-            public int I { get; set; }
-            public string S { get; set; }
-        }
-        class Test2
-        {
-            public Test2(Test test,Test3 t3)
-            {
-                I=test.I;
-            }
-            public int I { get; }
-            public string S { get; }
-        }
-        class Test3
-        {
-            public string Wut
-        }";
-            var result =
-@"      class Test
-        {
-            public int I { get; set; }
-            public string S { get; set; }
-        }
-        class Test2
-        {
-            public Test2(Test test,Test3 t3)
-            {
-                I=test.I;
-        S = test.S;
-    }
-            public int I { get; }
-            public string S { get; }
-        }
-        class Test3
-        {
-            public string Wut
-        }";
-            VerifyCSharpFix(code, result, 0);
+            var code = DataHelper.SomeCode;
+            var result = DataHelper.Result("ConstructorBodyFillFromArgument");
+            VerifyCSharpFix(code, result);
         }
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {

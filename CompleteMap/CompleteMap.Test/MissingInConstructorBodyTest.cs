@@ -32,29 +32,35 @@ namespace Phil.Test
                     Locations =
                         new[]
                         {
-                            new DiagnosticResultLocation("Test0.cs", 8, 13)
+                            new DiagnosticResultLocation("Test0.cs", 11, 9)
+                        }
+                },
+
+                new DiagnosticResult
+                {
+                    Id = "MissingInConstructorBody",
+                    Message = "MissingInConstructorBody",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 25, 9)
+                        }
+                },
+
+                new DiagnosticResult
+                {
+                    Id = "MissingInConstructorBody",
+                    Message = "MissingInConstructorBody",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 27, 9)
                         }
                 }
             };
-            string code =
-@"      class Test
-        {
-            public int I { get; set; }
-            public string S { get; set; }
-        }
-        class Test2
-        {
-            public Test2(Test test,Test3 t3)
-            {
-                I=test.I;
-            }
-            public int I { get; }
-            public string S { get; }
-        }
-        class Test3
-        {
-            public string Wut
-        }";
+            string code = DataHelper.SomeCode;
             VerifyCSharpDiagnostic(code, expected);
         }
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()

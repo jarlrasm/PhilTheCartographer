@@ -26,12 +26,23 @@ namespace Phil.Test
                     Locations =
                         new[]
                         {
-                            new DiagnosticResultLocation("Test0.cs", 24, 25)
+                            new DiagnosticResultLocation("Test0.cs", 44, 37)
+                        }
+                },
+                new DiagnosticResult
+                {
+                    Id = "MissingInInitializer",
+                    Message = "MissingInInitializer",
+                    Severity = DiagnosticSeverity.Info,
+                    Locations =
+                        new[]
+                        {
+                            new DiagnosticResultLocation("Test0.cs", 45, 43)
                         }
                 }
             };
 
-            VerifyCSharpDiagnostic(DataHelper.SomeCode(), expected);
+            VerifyCSharpDiagnostic(DataHelper.SomeCode, expected);
         }
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {

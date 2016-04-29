@@ -23,34 +23,8 @@ namespace Phil.Test
         [TestMethod]
         public void FillFromArgument()
         {
-            var result =
-@"class Test
-{
-    public int I{get;set;}
-    public string S{get;set;}
-}
-class Test2
-{
-    public Test2()
-    {}
-    public Test2(int i, string s)
-    {
-        I=i,S=s
-    }
-    public int I{get;set;}
-    public string S{get;set;}
-}
-class TypeName
-{   
-    public Test2 field;
-    public Test2 Getter{return field;}
-    public void T(Test eh)
-    {
-        var t2=new Test2(eh.I, eh.S) {I=default(int),S=""S""};
-        var t=new Test(){I=default(int)};
-    }
-}";
-            VerifyCSharpFix(DataHelper.SomeCode(), result, 0);
+            var result = DataHelper.Result("ConstructorFillFromArgument");
+            VerifyCSharpFix(DataHelper.SomeCode, result);
         }
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {

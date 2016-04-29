@@ -93,7 +93,7 @@ namespace Phil.CodeFixProviders
             var missingprops = GetMissingProperties(expression, targetTypeInfo);
 
             var newproperties =
-                sourceType.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => x.IsMissing(missingprops));
+                sourceType.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Where(x => x.IsMissing(missingprops));
             var newExpression = expression.AddExpressions(
                 newproperties.Select(x =>
                                          SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
