@@ -14,7 +14,7 @@ namespace Phil.Extensions
         {
             var typesymbols = semanticModel.LookupSymbols(node.SpanStart)
                 .OfType<ILocalSymbol>()
-                .Where(x => x.Locations.First().GetLineSpan().StartLinePosition < node.GetLocation().GetLineSpan().StartLinePosition)
+                .Where(x => x.Locations.Any() && x.Locations.First().GetLineSpan().StartLinePosition < node.GetLocation().GetLineSpan().StartLinePosition)
                 .Select(x => new TypedSymbol { Name = x.Name, Type = x.Type })
                 .Concat(
                     semanticModel.LookupSymbols(node.SpanStart)
@@ -31,11 +31,15 @@ namespace Phil.Extensions
                 );
             if (!semanticModel.GetEnclosingSymbol(node.SpanStart).IsStatic)
             {
-                typesymbols = typesymbols.Concat(new TypedSymbol[]
-                {
-                    new TypedSymbol()
-                    {Name = "this",Type =  (ITypeSymbol)semanticModel.GetDeclaredSymbol(node.Ancestors().OfType<ClassDeclarationSyntax>().First())}
-                });
+                var classDeclaration = node.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+                if(classDeclaration!=null)
+                { 
+                    typesymbols = typesymbols.Concat(new TypedSymbol[]
+                    {
+                        new TypedSymbol()
+                        {Name = "this",Type =  (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)}
+                    });
+                }
             }
             return typesymbols;
 
