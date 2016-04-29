@@ -8,6 +8,7 @@ Vs2015 plugin for simplifying mapping.
 ###Fill in 
   * object initializer
   * constructor-usage
+  * constructorbody
 
 ###Map from
   * local variables
@@ -22,7 +23,6 @@ Vs2015 plugin for simplifying mapping.
 
 ###Fill in 
   * linq Select
-  * .ctor
 
 ###Map from
   
