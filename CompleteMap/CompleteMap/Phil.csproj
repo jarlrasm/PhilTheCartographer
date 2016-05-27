@@ -32,10 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Analyzers\MissingInInitializerAnalyzer.cs" />
     <Compile Include="Refactorings\FillConstrutorBodyRefactoring.cs" />
+    <Compile Include="Refactorings\FillInitializerRefactoring.cs" />
     <Compile Include="Refactorings\TypedSymbol.cs" />
-    <Compile Include="CodeFixProviders\InitializerFixer.cs" />
     <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\SemanticModelExtensions.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
