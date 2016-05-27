@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Phil.Analyzers;
+using Phil.Refactorings;
 
 namespace Phil.Extensions
 {

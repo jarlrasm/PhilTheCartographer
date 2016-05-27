@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Phil.Analyzers
+namespace Phil.Refactorings
 {
     public class TypedSymbol
     {
