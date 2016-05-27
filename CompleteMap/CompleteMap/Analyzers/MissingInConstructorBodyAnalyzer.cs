@@ -50,13 +50,22 @@ namespace Phil.Analyzers
                             .Where(ex=>ex.Expression is AssignmentExpressionSyntax)
                             .Select(ex=>ex.Expression as AssignmentExpressionSyntax)
                             .All(
-                                y => ((IdentifierNameSyntax)(y).Left).Identifier.Text != x.Name));
+                                y => GetNameSyntax(y)?.Identifier.Text != x.Name));
                 if (unimplemntedProperties.Any())
                 {
                     ReportForUnimplemented(context, unimplemntedProperties, semanticModel, node);
                 }
             }
         }
+
+
+        private static SimpleNameSyntax GetNameSyntax(AssignmentExpressionSyntax assignmentExpressionSyntax)
+        {
+            if (assignmentExpressionSyntax.Left is IdentifierNameSyntax)
+                return assignmentExpressionSyntax.Left as IdentifierNameSyntax;
+            return (assignmentExpressionSyntax.Left as MemberAccessExpressionSyntax)?.Name;
+        }
+
 
         private static void ReportForUnimplemented(SyntaxNodeAnalysisContext context, IEnumerable<TypedSymbol> unimplemntedProperties, SemanticModel semanticModel, ConstructorDeclarationSyntax node)
         {;
