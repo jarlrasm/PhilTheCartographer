@@ -33,16 +33,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Analyzers\MissingInConstructorBodyAnalyzer.cs" />
-    <Compile Include="Analyzers\MissingInConstructorAnalyzer.cs" />
     <Compile Include="Analyzers\MissingInInitializerAnalyzer.cs" />
     <Compile Include="Analyzers\TypedSymbol.cs" />
     <Compile Include="CodeFixProviders\ConstructorBodyFixer.cs" />
-    <Compile Include="CodeFixProviders\ConstructorFixer.cs" />
     <Compile Include="CodeFixProviders\InitializerFixer.cs" />
     <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\SemanticModelExtensions.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Refactorings\FillConstrutorRefactoring.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Diagnostic.nuspec">

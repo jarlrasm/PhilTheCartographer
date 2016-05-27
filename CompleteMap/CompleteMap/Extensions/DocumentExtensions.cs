@@ -35,7 +35,7 @@ namespace Phil.Extensions
         }
 
 
-        private static ITypeSymbol GetSourceType(SyntaxNode expression, string sourcename, SemanticModel semanticModel, ITypeSymbol typeSymbol)
+        public static ITypeSymbol GetSourceType(this SyntaxNode expression, string sourcename, SemanticModel semanticModel, ITypeSymbol typeSymbol)
         {
             if (sourcename=="this")
             {

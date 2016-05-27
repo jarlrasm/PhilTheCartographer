@@ -17,7 +17,7 @@ using Phil.Extensions;
 
 namespace Phil.CodeFixProviders
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ConstructorFixer))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ConstructorBodyFixer))]
     public class ConstructorBodyFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds
