@@ -102,13 +102,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConstructorBodyFixerTest.cs" />
-    <Compile Include="ConstructorFixerTest.cs" />
-    <Compile Include="Helpers\DataHelper.cs" />
-    <Compile Include="InitializerFixerTest.cs" />
-    <Compile Include="MissingInConstructorBodyTest.cs" />
-    <Compile Include="MissingInConstructorTest.cs" />
-    <Compile Include="MissingInInitializerTest.cs" />
+    <Compile Include="FillConstructorBodyTest.cs" />
+    <Compile Include="Helpers\TestHelper.cs" />
+    <Compile Include="FillInitializerTest.cs" />
+    <Compile Include="FillConstructorTest.cs" />
     <Content Include="TestCode\Input.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -130,11 +127,6 @@
     <Content Include="TestCode\Output\InitializerFixerFillBlanks.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Verifiers\CodeFixVerifier.cs" />
-    <Compile Include="Verifiers\DiagnosticVerifier.cs" />
-    <Compile Include="Helpers\CodeFixVerifier.Helper.cs" />
-    <Compile Include="Helpers\DiagnosticResult.cs" />
-    <Compile Include="Helpers\DiagnosticVerifier.Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

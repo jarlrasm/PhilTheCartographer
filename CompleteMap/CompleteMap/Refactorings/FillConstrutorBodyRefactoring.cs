@@ -18,7 +18,7 @@ using Phil.Extensions;
 
 namespace Phil.Refactorings
 {
-    [ExportCodeRefactoringProvider("FillConstrutorBodyRefactoring", LanguageNames.CSharp), Shared]
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp)]
     public class FillConstrutorBodyRefactoring : CodeRefactoringProvider
     {
         public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)

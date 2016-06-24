@@ -18,8 +18,8 @@ using Phil.Extensions;
 
 namespace Phil.Refactorings
 {
-    [ExportCodeRefactoringProvider("FillInitializerRefaktoring", LanguageNames.CSharp), Shared]
-    public class FillInitializerRefaktoring : CodeRefactoringProvider
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp)]
+    public class FillInitializerRefactoring : CodeRefactoringProvider
     {
         public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
@@ -88,7 +88,7 @@ namespace Phil.Refactorings
                 this.node = node;
                 this.semanticModel = semanticModel;
                 this.document = document;
-                Title = $"Fill inn blanks";
+                Title = $"Fill in blanks";
             }
 
 
