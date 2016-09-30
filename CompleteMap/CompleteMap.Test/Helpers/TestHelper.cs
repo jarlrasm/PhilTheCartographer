@@ -52,6 +52,7 @@ namespace CompleteMap.Test.Helpers
         {
             var document = new AdhocWorkspace()
                 .AddProject("Test", "C#")
+                .AddMetadataReference(MetadataReference.CreateFromFile(typeof(Dictionary<string, string>).Assembly.Location))
                 .AddDocument("Test", code);
             return document;
         }

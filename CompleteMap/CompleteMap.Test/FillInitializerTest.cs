@@ -41,7 +41,7 @@ namespace Phil.Test
         [TestMethod]
         public void DontCrashDictionaries()
         {
-            var code = @"{var foobar=new Dictionary<string, string> { { ""foo"", ""bar"" } };}";
+            var code = @"var foobar=new System.Collections.Generic.Dictionary<string, string> { { ""foo"", ""bar"" } };";
             var document = TestHelper.GetDocument(code);
             var refactorings = TestHelper.FindRefactorings(new FillInitializerRefactoring(), document, @"bar"" } ");
         }
