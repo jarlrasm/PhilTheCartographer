@@ -133,13 +133,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CompleteMap\Phil.csproj">
-      <Project>{73EAD745-FB14-4183-AC71-A81D7FB716E3}</Project>
-      <Name>Phil</Name>
-    </ProjectReference>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\..\src\Phil\Phil.csproj">
+      <Project>{ecd92dbe-ca35-4c0c-869c-40e96d80a7b5}</Project>
+      <Name>Phil</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
