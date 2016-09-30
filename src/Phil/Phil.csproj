@@ -95,7 +95,6 @@
     <Compile Include="Refactorings\FillConstrutorBodyRefactoring.cs" />
     <Compile Include="Refactorings\FillConstrutorRefactoring.cs" />
     <Compile Include="Refactorings\FillInitializerRefactoring.cs" />
-    <Compile Include="Refactorings\TypedSymbol.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Diagnostic.nuspec">
@@ -107,6 +106,12 @@
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Phil.Core\Phil.Core.fsproj">
+      <Project>{7613ae34-25cd-411e-9fb3-e4d64b922114}</Project>
+      <Name>Phil.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

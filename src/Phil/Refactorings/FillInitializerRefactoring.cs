@@ -70,7 +70,7 @@ namespace Phil.Refactorings
                                                    TypeInfo typeSymbol)
         {
             var typesymbols = semanticModel.GetTypeSymbols(node, typeSymbol);
-            var symbols = typesymbols.Where(x => ImplementsSomethingFor(x.Type, unimplemntedProperties))
+            var symbols = typesymbols.Where(x => ImplementsSomethingFor(x.TypeSymbol, unimplemntedProperties))
                 .Distinct();
 
 

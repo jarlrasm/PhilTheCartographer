@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using Phil.Core;
 using Phil.Extensions;
 
 namespace Phil.Refactorings
@@ -63,7 +64,7 @@ namespace Phil.Refactorings
         }
 
 
-        private static void ReportForUnimplemented(CodeRefactoringContext context, IEnumerable<TypedSymbol> unimplemntedProperties, SemanticModel semanticModel, ConstructorDeclarationSyntax node)
+        private static void ReportForUnimplemented(CodeRefactoringContext context, IEnumerable<NamedSymbol> unimplemntedProperties, SemanticModel semanticModel, ConstructorDeclarationSyntax node)
         {
             ;
             var symbols = node.ParameterList.Parameters.Where(x => ImplementsSomethingFor(x.Type, unimplemntedProperties, semanticModel))
@@ -74,7 +75,7 @@ namespace Phil.Refactorings
                     new FixConstructorBody( node.Body, symbol.Identifier.Text, semanticModel, context.Document));
         }
 
-        private static bool ImplementsSomethingFor(TypeSyntax type, IEnumerable<TypedSymbol> unimplemntedProperties, SemanticModel semanticModel)
+        private static bool ImplementsSomethingFor(TypeSyntax type, IEnumerable<NamedSymbol> unimplemntedProperties, SemanticModel semanticModel)
         {
             return semanticModel.GetTypeInfo(type).Type.GetMembers().Where(x => x.Kind == SymbolKind.Property).Cast<IPropertySymbol>().Any(x => x.IsMissing(unimplemntedProperties));
 

@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using Phil.Core;
 using Phil.Refactorings;
 
 namespace Phil.Extensions
@@ -50,13 +51,13 @@ namespace Phil.Extensions
         {
             return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
         }
-        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<TypedSymbol> missingprops)
+        public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<NamedSymbol> missingprops)
         {
             return missingprops.Any(x => Compare(symbol, x));
         }
-        private static bool Compare(IPropertySymbol symbol, TypedSymbol parameter)
+        private static bool Compare(IPropertySymbol symbol, NamedSymbol parameter)
         {
-            return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.Type.Equals(symbol.Type);
+            return parameter.Name.ToLower() == symbol.Name.ToLower() && parameter.TypeSymbol.Equals(symbol.Type);
         }
 
         public static bool IsMissing(this IPropertySymbol symbol, IEnumerable<IPropertySymbol> mssingParameters)

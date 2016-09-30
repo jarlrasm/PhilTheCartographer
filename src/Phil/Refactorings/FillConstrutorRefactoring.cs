@@ -56,7 +56,7 @@ namespace Phil.Refactorings
             var unimplemntedParameters = constructor.Parameters.Skip(node.Arguments.Count);
             var typesymbols = semanticModel.GetTypeSymbols(node, typeSymbol);
 
-            var symbols = typesymbols.Where(x => ImplementsSomethingFor(x.Type, unimplemntedParameters))
+            var symbols = typesymbols.Where(x => ImplementsSomethingFor(x.TypeSymbol, unimplemntedParameters))
                 .Distinct();
 
 
