@@ -47,7 +47,17 @@ namespace Phil.Refactorings
                 properties.Where(
                     x =>
                         node.Expressions.All(
-                            y => ((IdentifierNameSyntax)((AssignmentExpressionSyntax)y).Left).Identifier.Text != x.PropertyName()));
+                            y =>
+                            {
+                                var assignmentExpressionSyntax = y as AssignmentExpressionSyntax;
+                                if (assignmentExpressionSyntax != null)
+                                {
+                                    var identifierNameSyntax = assignmentExpressionSyntax.Left as IdentifierNameSyntax;
+                                    if (identifierNameSyntax != null)
+                                        return identifierNameSyntax.Identifier.Text != x.PropertyName();
+                                }
+                                return false;
+                            }));
             if (unimplemntedProperties.Any())
             {
                 ReportForUnimplemented(context, unimplemntedProperties, semanticModel, node, typeSymbol);
