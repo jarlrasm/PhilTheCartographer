@@ -26,15 +26,22 @@ namespace CompleteMap.Test.Helpers
 
         public static void TestRefactoring( CodeRefactoringProvider codeRefactoringProvider, string interestingText, string expectedTitle, string resultFilename)
         {
+            TestRefactor(codeRefactoringProvider, expectedTitle, SomeCode,  Result(resultFilename), interestingText);
+        }
+
+        public static void TestRefactor(CodeRefactoringProvider codeRefactoringProvider,string expectedTitle, string code, string result, string interestingText=null)
+        {
+            if (interestingText == null)
+                interestingText = code;
+
             var document = new AdhocWorkspace()
                .AddProject("Test", "C#")
-               .AddDocument("Test", SomeCode);
+               .AddDocument("Test", code);
             var refactorings = new List<CodeAction>();
-            var context = new CodeRefactoringContext(document, new TextSpan(SomeCode.IndexOf(interestingText, StringComparison.InvariantCulture) + interestingText.Length, 0),
+            var context = new CodeRefactoringContext(document, new TextSpan(code.IndexOf(interestingText, StringComparison.InvariantCulture) + interestingText.Length, 0),
                                                      refactorings.Add, CancellationToken.None);
-      
             codeRefactoringProvider.ComputeRefactoringsAsync(context).Wait();
-            Assert.AreEqual(1, refactorings.Count(x => x.Title==expectedTitle));
+            Assert.AreEqual(1, refactorings.Count(x => x.Title == expectedTitle));
             var refaktoring = refactorings.First(x => x.Title == expectedTitle);
             var operations = refaktoring.GetOperationsAsync(CancellationToken.None).Result;
             Assert.AreEqual(1, operations.Length);
@@ -42,7 +49,11 @@ namespace CompleteMap.Test.Helpers
             operations.First().Apply(workspace, CancellationToken.None);
             document = workspace.CurrentSolution.GetDocument(document.Id);
             var text = document.GetTextAsync(CancellationToken.None).Result.ToString();
-            Assert.AreEqual(text, Result(resultFilename));
+
+
+            result = result.Replace("\r","");
+            text = text.Replace("\r", "");
+            Assert.AreEqual(text, result);
         }
     }
 }
