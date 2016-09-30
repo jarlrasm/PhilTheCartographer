@@ -36,5 +36,14 @@ namespace Phil.Test
         {
             TestHelper.TestRefactoring(new FillInitializerRefactoring(), search, "Fill in blanks", "InitializerFixerFillBlanks");
         }
+
+        
+        [TestMethod]
+        public void DontCrashDictionaries()
+        {
+            var code = @"{var foobar=new Dictionary<string, string> { { ""foo"", ""bar"" } };}";
+            var document = TestHelper.GetDocument(code);
+            var refactorings = TestHelper.FindRefactorings(new FillInitializerRefactoring(), document, @"bar"" } ");
+        }
     }
 }
