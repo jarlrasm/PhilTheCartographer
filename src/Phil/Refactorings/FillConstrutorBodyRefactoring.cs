@@ -39,7 +39,8 @@ namespace Phil.Refactorings
                 var semanticModel = (SemanticModel)await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
                 
                 var body = node.Body;
-                
+                if(body==null)
+                    return;
                 var properties = semanticModel.GetTypeSymbols(node)
                     .Where(x => x.Name != "this");
                 var unimplemntedProperties =
