@@ -1,8 +1,5 @@
 # Phil the Cartographer
 Vs2015 plugin for simplifying mapping.
-
-[Vsix installation available from here!](https://www.myget.org/F/phil-the-cartographer/vsix/)
-
 ## Current support
 
 ###Fill in 
